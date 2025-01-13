@@ -11,7 +11,7 @@ namespace MoviePriceComparer.Services
         private readonly HttpClient _httpClient;
         private readonly AsyncRetryPolicy _retryPolicy;
         private readonly SemaphoreSlim _semaphore;
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10); // Set a timeout for HTTP requests
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1); // Set a timeout for HTTP requests
 
         public MovieService(HttpClient httpClient)
         {
@@ -19,8 +19,8 @@ namespace MoviePriceComparer.Services
             _retryPolicy = Policy
                 .Handle<HttpRequestException>()
                 .Or<TaskCanceledException>()
-                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-            _semaphore = new SemaphoreSlim(10); // Limit to 10 concurrent requests
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+            _semaphore = new SemaphoreSlim(50); // Concurrent requests limit
         }
 
         public async Task<List<MovieDetails>> GetAllMoviesAsync()
